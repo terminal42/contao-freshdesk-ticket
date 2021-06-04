@@ -6,3 +6,13 @@ services:
 
     Terminal42\FreshdeskTicketBundle\:
         resource: '../src/'
+
+    Terminal42\FreshdeskTicketBundle\EventListener\FormFieldListener:
+        public: true
+        arguments:
+            $connection: '@database_connection'
+
+    Terminal42\FreshdeskTicketBundle\EventListener\FormListener:
+        public: true
+        arguments:
+            $connection: '@database_connection'
