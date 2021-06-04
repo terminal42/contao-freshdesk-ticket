@@ -1,0 +1,51 @@
+{
+    "name": "terminal42/contao-freshdesk-ticket",
+    "description": "Create freshdesk ticket from Contao form submission",
+    "keywords": ["contao", "freshdesk", "form", "ticket"],
+    "type": "contao-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "terminal42 gmbh",
+            "homepage": "https://www.terminal42.ch"
+        }
+    ],
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/terminal42"
+        },
+        {
+            "type": "other",
+            "url": "https://ko-fi.com/terminal42"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/terminal42/contao-freshdesk-ticket/issues",
+        "source": "https://github.com/terminal42/contao-freshdesk-ticket"
+    },
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "contao/core-bundle": "^4.9"
+    },
+    "require-dev": {
+        "contao/manager-plugin": "^2.0",
+        "contao/easy-coding-standard": "^3.0"
+    },
+    "conflict": {
+        "contao/manager-plugin": "<2.0 || >=3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Terminal42\\FreshdeskTicketBundle\\": "src/"
+        }
+    },
+    "extra": {
+        "contao-manager-plugin": "Terminal42\\FreshdeskTicketBundle\\ContaoManager\\Plugin"
+    },
+    "scripts": {
+        "cs-fixer": [
+            "vendor/bin/ecs check src/ --fix --ansi"
+        ]
+    }
+}

@@ -1,0 +1,8 @@
+services:
+    _defaults:
+        autoconfigure: true
+        autowire: false
+        public: false
+
+    Terminal42\FreshdeskTicketBundle\:
+        resource: '../src/'
