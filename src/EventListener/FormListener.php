@@ -41,8 +41,13 @@ class FormListener
 
         // Generate the data
         foreach ($formFields as $formField) {
-            if ($submitted[$formField['name']]) {
-                $data[$formField['name']] = $submitted[$formField['name']];
+            $value = $submitted[$formField['name']] ?? null;
+            if ($value) {
+                if ($formField['type'] === 'hidden' && is_numeric($value)) {
+                    $value = (int) $value;
+                }
+
+                $data[$formField['name']] = $value;
             }
         }
 
@@ -50,8 +55,13 @@ class FormListener
             return;
         }
 
-        $data['priority'] = 1;
-        $data['status'] = 2;
+        $data = array_merge(
+            [
+                'priority' => 1,
+                'status' => 2,
+            ],
+            $data
+        );
 
         $response = HttpClient::createForBaseUri(rtrim($form['freshdesk_apiUrl'], '/') . '/api/v2/')->request('POST', 'tickets', [
             'auth_basic' => [$form['freshdesk_apiKey'], 'X'],
