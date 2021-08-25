@@ -11,4 +11,3 @@ services:
         public: true
         arguments:
             $connection: '@database_connection'
-            $projectDir: '%kernel.project_dir%'

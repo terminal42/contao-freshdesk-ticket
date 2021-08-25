@@ -8,8 +8,9 @@ use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Part\DataPart;
-use Symfony\Component\Mime\Part\Multipart\FormDataPart;
+use Terminal42\FreshdeskTicketBundle\Mime\FormDataPart;
 
 class FormListener
 {
@@ -19,18 +20,11 @@ class FormListener
     private $connection;
 
     /**
-     * @var string
-     */
-    private $projectDir;
-
-    /**
      * @param Connection $connection
-     * @param string $projectDir
      */
-    public function __construct(Connection $connection, string $projectDir)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
-        $this->projectDir = $projectDir;
     }
 
     /**
@@ -47,7 +41,7 @@ class FormListener
         );
 
         foreach ($records as $record) {
-            $options[$record['name']] = sprintf('%s [%s]', $record['label'], $record['name']);
+            $options[$record['name']] = sprintf('%s <span class="tl_gray">[%s]</span>', $record['label'], $record['name']);
         }
 
         return $options;
@@ -101,7 +95,11 @@ class FormListener
         if (is_array($uploadFormFields = StringUtil::deserialize($form['freshdesk_uploads']))) {
             foreach ($uploadFormFields as $uploadFormField) {
                 if (isset($files[$uploadFormField])) {
-                    $uploads[] = DataPart::fromPath($this->projectDir . '/' . $files[$uploadFormField]['name']);
+                    try {
+                        $uploads[] = DataPart::fromPath($files[$uploadFormField]['tmp_name'], $files[$uploadFormField]['name']);
+                    } catch (InvalidArgumentException $e) {
+                        continue;
+                    }
                 }
             }
         }
@@ -112,7 +110,18 @@ class FormListener
 
         // Send the multipart/form-data or JSON depending on whether there are file uploads, or not
         if (count($uploads) > 0) {
+            // Convert all integers to strings as form data can only be string values
+            foreach ($data as $k => $v) {
+                if (is_int($v)) {
+                    $data[$k] = (string) $v;
+                }
+            }
+
+            $data['attachments'] = $uploads;
+
+            // Use our custom FormDataPart as Freshdesk does not accept "attachments[0]", "attachments[1]" but only multiple "attachments[]"
             $formData = new FormDataPart($data);
+
             $requestData['headers'] = $formData->getPreparedHeaders()->toArray();
             $requestData['body'] = $formData->bodyToIterable();
         } else {
@@ -120,7 +129,7 @@ class FormListener
         }
 
         $response = HttpClient::createForBaseUri(rtrim($form['freshdesk_apiUrl'], '/') . '/api/v2/')->request('POST', 'tickets', $requestData);
-
+dump($response->getStatusCode());exit;
         if ($response->getStatusCode() !== 201) {
             throw new \RuntimeException(sprintf('Freshdesk ticket creation failed with status code: %s', $response->getStatusCode()));
         }

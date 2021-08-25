@@ -37,6 +37,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['freshdesk_mapper'] = [
     'exclude' => true,
     'inputType' => 'multiColumnWizard',
     'eval' => [
+        'tl_class' => 'clr',
         'columnFields' => [
             'freshdesk_mapperKey' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_form']['freshdesk_mapperKey'],
@@ -48,7 +49,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['freshdesk_mapper'] = [
                 'label' => &$GLOBALS['TL_LANG']['tl_form']['freshdesk_mapperValue'],
                 'exclude' => true,
                 'inputType' => 'text',
-                'eval' => ['style' => 'width:360px'],
+                'eval' => ['decodeEntities' => true, 'style' => 'width:360px'],
             ],
             'freshdesk_mapperType' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_form']['freshdesk_mapperType'],
