@@ -129,7 +129,7 @@ class FormListener
         }
 
         $response = HttpClient::createForBaseUri(rtrim($form['freshdesk_apiUrl'], '/') . '/api/v2/')->request('POST', 'tickets', $requestData);
-dump($response->getStatusCode());exit;
+
         if ($response->getStatusCode() !== 201) {
             throw new \RuntimeException(sprintf('Freshdesk ticket creation failed with status code: %s', $response->getStatusCode()));
         }
