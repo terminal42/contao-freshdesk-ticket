@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Terminal42\FreshdeskTicketBundle\EventListener;
 
 use Contao\CoreBundle\ServiceAnnotation\Hook;
@@ -24,7 +26,7 @@ class FormSubmitListener
 
         // Generate the data based on mapper
         foreach ((array) StringUtil::deserialize($form['freshdesk_mapper']) as $item) {
-            if ($item['freshdesk_mapperKey'] === '' || $item['freshdesk_mapperValue'] === '') {
+            if ('' === $item['freshdesk_mapperKey'] || '' === $item['freshdesk_mapperValue']) {
                 continue;
             }
 
@@ -35,9 +37,11 @@ class FormSubmitListener
                 case 'integer':
                     $value = (int) $value;
                     break;
+
                 case 'string':
                     $value = (string) $value;
                     break;
+
                 default:
                     throw new \RuntimeException(sprintf('Unsupported data type: %s', $item['freshdesk_mapperValue']));
             }
@@ -45,7 +49,7 @@ class FormSubmitListener
             $data[$item['freshdesk_mapperKey']] = $value;
         }
 
-        if (count($data) === 0) {
+        if (0 === \count($data)) {
             return;
         }
 
@@ -56,7 +60,7 @@ class FormSubmitListener
         $uploads = [];
 
         // Generate the form file uploads
-        if (is_array($uploadFormFields = StringUtil::deserialize($form['freshdesk_uploads']))) {
+        if (\is_array($uploadFormFields = StringUtil::deserialize($form['freshdesk_uploads']))) {
             foreach ($uploadFormFields as $uploadFormField) {
                 if (isset($files[$uploadFormField])) {
                     try {
@@ -73,10 +77,10 @@ class FormSubmitListener
         ];
 
         // Send the multipart/form-data or JSON depending on whether there are file uploads, or not
-        if (count($uploads) > 0) {
+        if (\count($uploads) > 0) {
             // Convert all integers to strings as form data can only be string values
             foreach ($data as $k => $v) {
-                if (is_int($v)) {
+                if (\is_int($v)) {
                     $data[$k] = (string) $v;
                 }
             }
@@ -92,9 +96,9 @@ class FormSubmitListener
             $requestData['json'] = $data;
         }
 
-        $response = HttpClient::createForBaseUri(rtrim($form['freshdesk_apiUrl'], '/') . '/api/v2/')->request('POST', 'tickets', $requestData);
+        $response = HttpClient::createForBaseUri(rtrim($form['freshdesk_apiUrl'], '/').'/api/v2/')->request('POST', 'tickets', $requestData);
 
-        if ($response->getStatusCode() !== 201) {
+        if (201 !== $response->getStatusCode()) {
             throw new \RuntimeException(sprintf('Freshdesk ticket creation failed with status code: %s', $response->getStatusCode()));
         }
     }
