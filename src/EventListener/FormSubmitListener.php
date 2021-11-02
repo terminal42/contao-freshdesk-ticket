@@ -30,7 +30,8 @@ class FormSubmitListener
                 continue;
             }
 
-            $value = StringUtil::parseSimpleTokens($item['freshdesk_mapperValue'], $submitted);
+            $value = str_replace('\n', "\n", (string) $item['freshdesk_mapperValue']);
+            $value = StringUtil::parseSimpleTokens($value, $submitted);
 
             // Convert the data type
             switch ($item['freshdesk_mapperType']) {
@@ -39,7 +40,6 @@ class FormSubmitListener
                     break;
 
                 case 'string':
-                    $value = (string) $value;
                     break;
 
                 default:
