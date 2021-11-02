@@ -1,13 +1,8 @@
 services:
     _defaults:
         autoconfigure: true
-        autowire: false
+        autowire: true
         public: false
 
     Terminal42\FreshdeskTicketBundle\:
         resource: '../src/'
-
-    Terminal42\FreshdeskTicketBundle\EventListener\FormListener:
-        public: true
-        arguments:
-            $connection: '@database_connection'

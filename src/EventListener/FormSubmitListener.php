@@ -3,54 +3,18 @@
 namespace Terminal42\FreshdeskTicketBundle\EventListener;
 
 use Contao\CoreBundle\ServiceAnnotation\Hook;
-use Contao\DataContainer;
 use Contao\StringUtil;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Part\DataPart;
 use Terminal42\FreshdeskTicketBundle\Mime\FormDataPart;
 
-class FormListener
+/**
+ * @Hook(value="processFormData")
+ */
+class FormSubmitListener
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * @param Connection $connection
-     */
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
-
-    /**
-     * On uploads options callback.
-     */
-    public function onUploadsOptionsCallback(DataContainer $dc): array
-    {
-        $options = [];
-        $supportedFormFieldTypes = ['upload', 'fineUploader'];
-        $records = $this->connection->fetchAllAssociative(
-            'SELECT type, name, label FROM tl_form_field WHERE pid=? AND type IN (?) ORDER BY sorting',
-            [$dc->id, $supportedFormFieldTypes],
-            [ParameterType::INTEGER, Connection::PARAM_STR_ARRAY]
-        );
-
-        foreach ($records as $record) {
-            $options[$record['name']] = sprintf('%s <span class="tl_gray">[%s]</span>', $record['label'], $record['name']);
-        }
-
-        return $options;
-    }
-
-    /**
-     * @Hook(value="processFormData")
-     */
-    public function onProcessFormData(array $submitted, array $form, array $files = null): void
+    public function __invoke(array $submitted, array $form, array $files = null): void
     {
         if (!$form['freshdesk_enable'] || !$form['freshdesk_apiUrl'] || !$form['freshdesk_apiKey']) {
             return;

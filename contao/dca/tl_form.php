@@ -67,7 +67,6 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['freshdesk_mapper'] = [
 $GLOBALS['TL_DCA']['tl_form']['fields']['freshdesk_uploads'] = [
     'exclude' => true,
     'inputType' => 'checkbox',
-    'options_callback' => [\Terminal42\FreshdeskTicketBundle\EventListener\FormListener::class, 'onUploadsOptionsCallback'],
     'eval' => ['multiple' => true, 'tl_class' => 'clr'],
     'sql' => ['type' => 'blob', 'notnull' => false],
 ];
